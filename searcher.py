@@ -61,22 +61,23 @@ try:
 
     def send_mail(to_email, subject, message, message_html=None, server=config.smtp_host,
                 from_email=config.smtp_from):
-        # Create message container - the correct MIME type is multipart/alternative.
-        msg = MIMEMultipart('alternative')
-        msg['Subject'] = subject
-        msg['From'] = from_email
-        msg['To'] = to_email
+        if config.enable_email:
+            # Create message container - the correct MIME type is multipart/alternative.
+            msg = MIMEMultipart('alternative')
+            msg['Subject'] = subject
+            msg['From'] = from_email
+            msg['To'] = to_email
 
-        part1 = MIMEText(message, 'plain')
-        msg.attach(part1)
-        if message_html!=None:
-            part2 = MIMEText(message_html, 'html')
-            msg.attach(part2)
-        server = smtplib.SMTP(server)
-        #server.set_debuglevel(1)
-        server.login(config.smtp_username, config.smtp_password)
-        server.send_message(msg)
-        server.quit()
+            part1 = MIMEText(message, 'plain')
+            msg.attach(part1)
+            if message_html!=None:
+                part2 = MIMEText(message_html, 'html')
+                msg.attach(part2)
+            server = smtplib.SMTP(server)
+            #server.set_debuglevel(1)
+            server.login(config.smtp_username, config.smtp_password)
+            server.send_message(msg)
+            server.quit()
     
 
     def None2Emptystring(s):
@@ -362,8 +363,10 @@ try:
         if len(problems_services)>0:
             text=text+"Services with problems: "+', '.join(problems_services)+'\n\n'
             text_html=text_html+"Services with problems: "+', '.join(problems_services)+'<P>\n'
+            print("Services with problems: "+', '.join(problems_services)+'\n\n')
         text=text+str(len(new_entries))+" neue Projekte\n\n"
         text_html=text_html+"<H1>"+str(len(new_entries))+" neue Projekte</H1><P>"
+        print(str(len(new_entries))+" neue Projekte\n\n")
         for entry in new_entries:
             text=text+entry["name"]+': '+entry["href"]+'\n\n'+entry["details"]+'\n\n'+'\n\n'
             t = "<H2>"+entry["name"]+'</H2><H3>'+ entry["details"] +'</h3>'
@@ -378,6 +381,7 @@ try:
         if len(problems_services)>0:
             text=text+"\n\nAll errors:\n\n "+'\n\n'.join(problems)
             text_html=text_html+"\n\n<p>All errors:<br>\n "+'\n<br>'.join(problems)
+            print("\n\nAll errors:\n\n "+'\n\n'.join(problems))
 
 
         send_mail(config.smtp_to, "New projects:", text, text_html)
@@ -389,4 +393,5 @@ try:
 except Exception as E:
     text = str(E)+"\n\n"+traceback.format_exc()
     send_mail(config.smtp_to, "Exception searching for new projects", text)
-    from bs4 import BeautifulSoup
+    print(str(E)+"\n\n"+traceback.format_exc())
+    

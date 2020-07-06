@@ -1,4 +1,5 @@
 
+enable_email = False
 smtp_host     = ""
 smtp_username = ""
 smtp_password = ""
