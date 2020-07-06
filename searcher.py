@@ -273,6 +273,87 @@ try:
             problems.append('freelancermap: '+str(E)+"\n\n"+traceback.format_exc())
 
 
+    if config.enable_allgeier:
+        offset=0
+        try:
+            while True:
+                foundonpage=0
+                main_url = "https://www.allgeier-experts.com/api/?EmploymentType%5B%5D=0&EmploymentType%5B%5D=1&EmploymentMode%5B%5D=1&EmploymentMode%5B%5D=0&type=9999&Count=100&Offset={}&Search={}".format(offset,config.search_term)
+                req = requests.get(main_url)
+                j = json.loads(req.text)
+
+                for p in j:
+                    href = p["Url"]
+                    name = p["Name"]
+                    it=""
+                    if "Description" in p:
+                        it = it + None2Emptystring(p["Description"])
+                    if "Branch" in p:
+                        it = it + " - Branch: "+None2Emptystring(p["Branch"])
+                    if "EmploymentType" in p:
+                        it = it + " - EmploymentType: "+None2Emptystring(p["EmploymentType"])
+                    if "Source" in p:
+                        it = it + " - Source: "+None2Emptystring(p["Source"])
+                    if "Location" in p:
+                        it = it + " - Location: "+None2Emptystring(p["Location"])
+                    if "CompanyName" in p:
+                        it = it + " - CompanyName: " + None2Emptystring(p["CompanyName"])
+                    it = ' '.join(it.split())
+                    add_entry(href,name,it,'allgeier')
+                    foundonpage=foundonpage+1
+
+                if foundonpage==0:
+                    break
+                offset = offset+100
+        except Exception as E:
+            if "allgeier" not in problems_services:
+                problems_services.append("allgeier")
+            problems.append('allgeier: '+str(E)+"\n\n"+traceback.format_exc())
+
+
+    if config.enable_computerfutures:
+        offset=0
+        page=0
+        try:
+            while True:
+                foundonpage=0
+                main_url = "https://api.websites.sthree.com/api/services/app/Search/Search"
+                data = '{"resultPage":'+str(page)+',"resultFrom":'+str(offset)+',"resultSize":50,"keywords":"'+config.search_term+'","language":"de-de","type":["Freie Mitarbeit / Projektmitarbeit"],"country":["Deutschland"],"brandCode":"CF"}'
+                headers = {"Content-Type": "application/json"}
+                req = requests.post(main_url, data=data, json=None, proxies=None, timeout=30, headers=headers)
+                j = json.loads(req.text)
+
+                for p in j["result"]["results"]:
+                    href = "https://www.computerfutures.com/de-de/job/"+p["slug"]+'/'+p["jobReference"]
+                    name = p["title"]
+                    it=""
+                    if "description" in p:
+                        it = it + None2Emptystring(p["description"])
+                    if "salaryText" in p:
+                        it = it + " - salary: "+None2Emptystring(p["salaryText"])
+                    if "salaryFrom" in p:
+                        it = it + " - salaryFrom: "+None2Emptystring(str(p["salaryFrom"]))
+                    if "salaryTo" in p:
+                        it = it + " - salaryTo: "+None2Emptystring(str(p["salaryTo"]))
+                    if "salaryAnnum" in p:
+                        it = it + " - salaryAnnum: "+None2Emptystring(str(p["salaryAnnum"]))
+                    if "skills" in p:
+                        it = it + " - skills: "+None2Emptystring(p["skills"])
+                    if "location" in p:
+                        it = it + " - location: "+None2Emptystring(p["location"])
+                    it = ' '.join(it.split())
+                    add_entry(href,name,it,'computerfutures')
+                    foundonpage=foundonpage+1
+
+                if foundonpage==0:
+                    break
+                offset = offset+50
+                page=page+1
+        except Exception as E:
+            if "computerfutures" not in problems_services:
+                problems_services.append("computerfutures")
+            problems.append('computerfutures: '+str(E)+"\n\n"+traceback.format_exc())
+
 
 
     if len(new_entries)>0 or len(problems_services)>0:

@@ -6,14 +6,16 @@ smtp_to       = ""
 smtp_from     = ""
 
 # Which services to query for the search term
-enable_gulp          = True
-enable_hays          = True
-enable_freelance_de  = True
-enable_projektwerk   = True
-enable_freelancermap = True
+enable_gulp            = True
+enable_hays            = True
+enable_freelance_de    = True
+enable_projektwerk     = True
+enable_freelancermap   = True
+enable_allgeier        = True
+enable_computerfutures = True
 
 # Search term used in the search engines 
-search_term      = ""
+search_term      = "Java"
 
 # Terms in this array will be colorized in green in the HTML results
 colorize_terms   =  [search_term, "Hamburg"]
